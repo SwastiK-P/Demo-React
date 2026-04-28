@@ -21,7 +21,7 @@ mov ax, @data
 mov ds, ax
 
 ; ==========================
-; DISPLAY HARDCODED INPUT
+; DISPLAY INPUT
 ; ==========================
 mov dx, offset msg1
 mov ah, 09h
@@ -33,111 +33,112 @@ int 21h
 
 
 ; ==========================
-; ADDITION SECTION
+; ADDITION
 ; ==========================
 mov dx, offset msg_add
 mov ah, 09h
 int 21h
 
-mov al, 08h
-mov bl, 02h
+mov al, 8
+mov bl, 2
 add al, bl
 
 call print_num
 
 
 ; ==========================
-; SUBTRACTION SECTION
+; SUBTRACTION
 ; ==========================
 mov dx, offset msg_sub
 mov ah, 09h
 int 21h
 
-mov al, 08h
-mov bl, 02h
+mov al, 8
+mov bl, 2
 sub al, bl
 
 call print_num
 
 
 ; ==========================
-; MULTIPLICATION SECTION
+; MULTIPLICATION
 ; ==========================
 mov dx, offset msg_mul
 mov ah, 09h
 int 21h
 
-mov al, 08h
-mov bl, 02h
-mul bl
+mov al, 8
+mov bl, 2
+mul bl          ; AX = result
+mov al, al      ; use AL
 
 call print_num
 
 
 ; ==========================
-; DIVISION SECTION
+; DIVISION
 ; ==========================
 mov dx, offset msg_div
 mov ah, 09h
 int 21h
 
 mov ax, 0008h
-mov bl, 02h
-div bl
+mov bl, 2
+div bl          ; AL = quotient
 
 call print_num
 
 
 ; ==========================
-; AND SECTION
+; AND
 ; ==========================
 mov dx, offset msg_and
 mov ah, 09h
 int 21h
 
-mov al, 08h
-mov bl, 02h
+mov al, 8
+mov bl, 2
 and al, bl
 
 call print_num
 
 
 ; ==========================
-; OR SECTION
+; OR
 ; ==========================
 mov dx, offset msg_or
 mov ah, 09h
 int 21h
 
-mov al, 08h
-mov bl, 02h
+mov al, 8
+mov bl, 2
 or al, bl
 
 call print_num
 
 
 ; ==========================
-; XOR SECTION
+; XOR
 ; ==========================
 mov dx, offset msg_xor
 mov ah, 09h
 int 21h
 
-mov al, 08h
-mov bl, 02h
+mov al, 8
+mov bl, 2
 xor al, bl
 
 call print_num
 
 
 ; ==========================
-; NOT SECTION
+; NOT
 ; ==========================
 mov dx, offset msg_not
 mov ah, 09h
 int 21h
 
-mov al, 08h
+mov al, 8
 not al
 
 call print_num
@@ -153,14 +154,42 @@ main endp
 
 
 ; ==========================
-; PRINT NUMBER (SINGLE DIGIT)
+; PRINT NUMBER (0–255)
 ; ==========================
 print_num proc
-add al, 30h
-mov dl, al
-mov ah, 02h
-int 21h
-ret
+
+    mov ah, 0
+    mov bl, 10
+
+    ; First divide (for tens)
+    div bl          ; AL=quotient, AH=remainder
+
+    mov bh, ah      ; save remainder
+
+    mov ah, 0
+    div bl          ; second divide
+
+    ; hundreds
+    add al, 30h
+    mov dl, al
+    mov ah, 02h
+    int 21h
+
+    ; tens
+    mov al, ah
+    add al, 30h
+    mov dl, al
+    mov ah, 02h
+    int 21h
+
+    ; ones
+    mov al, bh
+    add al, 30h
+    mov dl, al
+    mov ah, 02h
+    int 21h
+
+    ret
 print_num endp
 
 end main
