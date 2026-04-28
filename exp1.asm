@@ -31,7 +31,6 @@ mov dx, offset msg2
 mov ah, 09h
 int 21h
 
-
 ; ==========================
 ; ADDITION
 ; ==========================
@@ -42,9 +41,7 @@ int 21h
 mov al, 8
 mov bl, 2
 add al, bl
-
 call print_num
-
 
 ; ==========================
 ; SUBTRACTION
@@ -56,9 +53,7 @@ int 21h
 mov al, 8
 mov bl, 2
 sub al, bl
-
 call print_num
-
 
 ; ==========================
 ; MULTIPLICATION
@@ -70,10 +65,8 @@ int 21h
 mov al, 8
 mov bl, 2
 mul bl          ; AX = result
-mov al, al      ; use AL
-
+; AL has result (for small values)
 call print_num
-
 
 ; ==========================
 ; DIVISION
@@ -85,9 +78,7 @@ int 21h
 mov ax, 0008h
 mov bl, 2
 div bl          ; AL = quotient
-
 call print_num
-
 
 ; ==========================
 ; AND
@@ -99,9 +90,7 @@ int 21h
 mov al, 8
 mov bl, 2
 and al, bl
-
 call print_num
-
 
 ; ==========================
 ; OR
@@ -113,9 +102,7 @@ int 21h
 mov al, 8
 mov bl, 2
 or al, bl
-
 call print_num
-
 
 ; ==========================
 ; XOR
@@ -127,9 +114,7 @@ int 21h
 mov al, 8
 mov bl, 2
 xor al, bl
-
 call print_num
-
 
 ; ==========================
 ; NOT
@@ -140,9 +125,7 @@ int 21h
 
 mov al, 8
 not al
-
 call print_num
-
 
 ; ==========================
 ; EXIT
@@ -152,22 +135,19 @@ int 21h
 
 main endp
 
-
 ; ==========================
 ; PRINT NUMBER (0–255)
 ; ==========================
 print_num proc
 
-    mov ah, 0
+    mov ah, 0        ; IMPORTANT: clear AH
     mov bl, 10
 
-    ; First divide (for tens)
-    div bl          ; AL=quotient, AH=remainder
-
-    mov bh, ah      ; save remainder
+    div bl           ; AL = quotient, AH = remainder
+    mov bh, ah       ; save ones
 
     mov ah, 0
-    div bl          ; second divide
+    div bl           ; second division
 
     ; hundreds
     add al, 30h
