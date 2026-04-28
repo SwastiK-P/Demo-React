@@ -41,6 +41,7 @@ int 21h
 mov al, 8
 mov bl, 2
 add al, bl
+mov ah, 0
 call print_num
 
 ; ==========================
@@ -53,6 +54,7 @@ int 21h
 mov al, 8
 mov bl, 2
 sub al, bl
+mov ah, 0
 call print_num
 
 ; ==========================
@@ -65,7 +67,7 @@ int 21h
 mov al, 8
 mov bl, 2
 mul bl          ; AX = result
-; AL has result (for small values)
+mov ah, 0
 call print_num
 
 ; ==========================
@@ -78,6 +80,7 @@ int 21h
 mov ax, 0008h
 mov bl, 2
 div bl          ; AL = quotient
+mov ah, 0
 call print_num
 
 ; ==========================
@@ -90,6 +93,7 @@ int 21h
 mov al, 8
 mov bl, 2
 and al, bl
+mov ah, 0
 call print_num
 
 ; ==========================
@@ -102,6 +106,7 @@ int 21h
 mov al, 8
 mov bl, 2
 or al, bl
+mov ah, 0
 call print_num
 
 ; ==========================
@@ -114,6 +119,7 @@ int 21h
 mov al, 8
 mov bl, 2
 xor al, bl
+mov ah, 0
 call print_num
 
 ; ==========================
@@ -125,6 +131,7 @@ int 21h
 
 mov al, 8
 not al
+mov ah, 0
 call print_num
 
 ; ==========================
@@ -136,38 +143,37 @@ int 21h
 main endp
 
 ; ==========================
-; PRINT NUMBER (0–255)
+; PRINT NUMBER (CORRECT)
 ; ==========================
 print_num proc
 
-    mov ah, 0        ; IMPORTANT: clear AH
-    mov bl, 10
+    push ax
+    push bx
+    push cx
+    push dx
 
-    div bl           ; AL = quotient, AH = remainder
-    mov bh, ah       ; save ones
+    mov cx, 0
+    mov bx, 10
 
-    mov ah, 0
-    div bl           ; second division
+convert:
+    mov dx, 0
+    div bx          ; AX / 10
+    push dx         ; remainder
+    inc cx
+    cmp ax, 0
+    jne convert
 
-    ; hundreds
-    add al, 30h
-    mov dl, al
+print:
+    pop dx
+    add dl, 30h
     mov ah, 02h
     int 21h
+    loop print
 
-    ; tens
-    mov al, ah
-    add al, 30h
-    mov dl, al
-    mov ah, 02h
-    int 21h
-
-    ; ones
-    mov al, bh
-    add al, 30h
-    mov dl, al
-    mov ah, 02h
-    int 21h
+    pop dx
+    pop cx
+    pop bx
+    pop ax
 
     ret
 print_num endp
